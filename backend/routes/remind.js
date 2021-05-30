@@ -5,14 +5,13 @@ const User = require("../models/user");
 const Auth = require("../middleware/auth");
 
 router.post("/registerReminder", Auth, async (req, res) => {
-  verificateUser(req.user, res);
-  const data = req.body;
-  if (!data) {
+  verificateUser(req, res);
+  if (!req.body) {
     return res.status(400).send("No hay datos para guardar");
   } else {
-    if (!data.nameTask)
+    if (!req.body.nameTask)
       return res.status(400).send("No se ingresó un nombre de tarea");
-    if (!data.description)
+    if (!req.body.description)
       return res.status(400).send("No se ingresó una descripción");
   }
   const remind = new Remind({
@@ -28,8 +27,8 @@ router.post("/registerReminder", Auth, async (req, res) => {
 });
 
 router.get("/listReminder", Auth, async (req, res) => {
-  verificateUser(req.user, res);
-  const remind = await Remind.findById(req.user._id);
+  verificateUser(req, res);
+  const remind = await Remind.find({ idUser: req.user._id });
   if (!remind) return res.status(400).send("No hay datos para mostrar");
   res.status(200).send({ remind });
 });
@@ -37,14 +36,17 @@ router.get("/listReminder", Auth, async (req, res) => {
 router.put("/updateReminder", Auth, async (req, res) => {
   verificateUser(req, res);
   const data = req.body;
-  if (!data) {
+  if (!req.body) {
     return res.status(400).send("No hay datos para guardar");
   } else {
-    if (!data.nameTask)
+    if (!req.body._id)
+      return res.status(400).send("No se ha ingresado un Id de recordatorio");
+    if (!req.body.nameTask)
       return res.status(400).send("No se ingresó un nombre de tarea");
-    if (!data.description)
+    if (!req.body.description)
       return res.status(400).send("No se ingresó una descripción");
-    if (!data.status) return res.status(400).send("No se ingresó un status");
+    if (!req.body.status)
+      return res.status(400).send("No se ingresó un status");
   }
   const remind = await Remind.findByIdAndUpdate(req.body._id, {
     idUser: req.user._id,
@@ -58,7 +60,7 @@ router.put("/updateReminder", Auth, async (req, res) => {
 
 router.delete("/:_id", Auth, async (req, res) => {
   verificateUser(req, res);
-  const remind = await Remind.findByIdAndDelete(req.body._id);
+  const remind = await Remind.findByIdAndDelete(req.params._id);
   if (!remind) return res.status(400).send("No se pudo borrar el recordatorio");
   return res.status(200).send("Recordatorio eliminado");
 });

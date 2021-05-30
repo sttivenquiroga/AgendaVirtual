@@ -16,7 +16,7 @@ const port = process.env.PORT || 3003;
 app.listen(port, () => console.log("Conexión activa en el puerto " + port));
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/", {
+  .connect("mongodb://127.0.0.1:27017/virtualSchedule", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,

@@ -7,23 +7,20 @@ const bcrypt = require("bcrypt");
  * Register user module
  */
 router.post("/registerUser", async (req, res) => {
-  let data = req.body;
-  if (!data) {
+  if (!req.body) {
     return res.status(400).send("No hay datos para registrar");
   } else {
-    if (!data.name) return res.status(400).send("Nombre no ingresado");
-    if (!data.lastname) return res.status(400).send("Apellido no ingresado");
-    if (!data.email) return res.status(400).send("Correo no ingresado");
-    if (!data.user) return res.status(400).send("Usuario no ingresado");
-    if (!data.password) return res.status(400).send("Contraseña no ingresado");
+    if (!req.body.name) return res.status(400).send("Nombre no ingresado");
+    if (!req.body.lastname) return res.status(400).send("Apellido no ingresado");
+    if (!req.body.email) return res.status(400).send("Correo no ingresado");
+    if (!req.body.user) return res.status(400).send("Usuario no ingresado");
+    if (!req.body.password) return res.status(400).send("Contraseña no ingresado");
   } // Content validation
   let user = await User.findOne({ user: req.body.user });
   if (user) return res.status(400).send("Usuario ya registrado");
   user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).send("Correo ya registrado");
+  if (user) return res.status(400).send("Correo electronico ya registrado");
   const pass = await bcrypt.hash(req.body.password, 10);
-  user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Correo electronico ya registrado");
   user = new User({
     name: req.body.name,
     lastname: req.body.lastname,
